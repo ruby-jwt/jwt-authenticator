@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jwt-authenticator (1.0.0.rc1)
+    jwt-authenticator (1.0.0)
       activesupport (>= 4.0, < 6.0)
       jwt (~> 2.1.0)
       method-not-implemented (~> 1.0.1)

@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.version               = JWT::Authenticator::VERSION
   s.author                = "Yaroslav Konoplov"
   s.email                 = "eahome00@gmail.com"
-  s.summary               = "JWT auth."
-  s.description           = "JWT auth."
+  s.summary               = "JSON Web Token authentication Ruby service."
+  s.description           = "The gem provides easy & extendable way to perform JSON Web Token authentication."
   s.homepage              = "https://github.com/ruby-jwt/jwt-authenticator"
   s.license               = "Apache-2.0"
   s.files                 = `git ls-files -z`.split("\x0")
