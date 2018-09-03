@@ -155,6 +155,12 @@ class JWTAuthenticatorTest < Test::Unit::TestCase
     assert_equal(103, error.code)
   end
 
+  test "loading token verification options from environment (authenticator nested under multiple modules)" do
+    ENV["MY_API_V3_JWT_ISS"] = "bar"
+    authenticator = MyAPI::V3::JWTAuthenticator.instance
+    assert_equal(ENV["MY_API_V3_JWT_ISS"], authenticator.instance_variable_get(:@verification_options)[:iss])
+  end
+
 private
 
   def my_api_v1_token_verification_options

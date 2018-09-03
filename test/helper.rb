@@ -40,3 +40,11 @@ module MyAPIv2
     end
   end
 end
+
+module MyAPI
+  module V3
+    class JWTAuthenticator < JWT::Authenticator
+
+    end
+  end
+end
