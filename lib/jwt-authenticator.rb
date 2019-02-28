@@ -37,7 +37,7 @@ protected
     namespace = namespace.gsub(/_+\z/, "")
     { verify_expiration: ENV["#{namespace}_VERIFY_EXP"] != "false",
       verify_not_before: ENV["#{namespace}_VERIFY_NBF"] != "false",
-      iss:               ENV["#{namespace}_ISS"].to_s.squish.presence,
+      iss:               ENV["#{namespace}_ISS"].to_s.split(",").map(&:squish).reject(&:blank?).presence, # Comma-separated values.
       verify_iat:        ENV["#{namespace}_VERIFY_IAT"] != "false",
       verify_jti:        ENV["#{namespace}_VERIFY_JTI"] != "false",
       aud:               ENV["#{namespace}_AUD"].to_s.split(",").map(&:squish).reject(&:blank?).presence, # Comma-separated values.
