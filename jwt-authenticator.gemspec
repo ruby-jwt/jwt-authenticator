@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
   s.require_paths         = ["lib"]
   s.required_ruby_version = "~> 2.5"
 
-  s.add_dependency             "jwt", "~> 2.1.0"
-  s.add_dependency             "method-not-implemented", "~> 1.0.1"
+  s.add_dependency             "jwt", "~> 2.1"
+  s.add_dependency             "method-not-implemented", "~> 1.0"
   s.add_dependency             "activesupport", ">= 4.0", "< 6.0"
   s.add_development_dependency "bundler", "~> 1.7"
 end
