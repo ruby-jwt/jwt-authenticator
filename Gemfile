@@ -5,5 +5,5 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "rake", "~> 12.3"
+gem "rake", "~> 13.0"
 gem "test-unit", "~> 3.2"
