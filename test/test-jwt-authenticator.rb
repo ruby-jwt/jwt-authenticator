@@ -33,7 +33,7 @@ class JWTAuthenticatorTest < Test::Unit::TestCase
     end
 
     modify_environment "MY_API_V1_JWT_ISS", " foo " do
-      assert_equal(default.merge(iss: "foo", verify_iss: true), my_api_v1_token_verification_options)
+      assert_equal(default.merge(iss: %w[foo], verify_iss: true), my_api_v1_token_verification_options)
     end
 
     modify_environment "MY_API_V1_JWT_VERIFY_IAT", "false" do
@@ -138,7 +138,7 @@ class JWTAuthenticatorTest < Test::Unit::TestCase
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.merge(exp: Time.now.to_i - 5))
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\bexpired\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(104, error.code)
   end
 
   test "missing jti" do
@@ -158,7 +158,7 @@ class JWTAuthenticatorTest < Test::Unit::TestCase
   test "loading token verification options from environment (authenticator nested under multiple modules)" do
     ENV["MY_API_V3_JWT_ISS"] = "bar"
     authenticator = MyAPI::V3::JWTAuthenticator.instance
-    assert_equal(ENV["MY_API_V3_JWT_ISS"], authenticator.instance_variable_get(:@verification_options)[:iss])
+    assert_equal([ENV["MY_API_V3_JWT_ISS"]], authenticator.instance_variable_get(:@verification_options)[:iss])
   end
 
 private

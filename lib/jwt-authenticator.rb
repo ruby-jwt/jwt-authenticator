@@ -23,6 +23,8 @@ class JWT::Authenticator
     error! "Token type is not provided or invalid.", 102 unless token_type == "Bearer"
     returned = JWT.decode(token_value, nil, true, @verification_options) { |header| public_key(header.deep_symbolize_keys) }
     returned.map(&:deep_symbolize_keys)
+  rescue JWT::ExpiredSignature => e
+    error!(e.inspect, 104)
   rescue JWT::DecodeError => e
     error!(e.inspect, 103)
   end
