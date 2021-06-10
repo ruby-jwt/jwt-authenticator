@@ -18,15 +18,19 @@ class JWT::Authenticator
   end
 
   def call(token)
-    error! "Token is missing.", 101 if token.blank?
-    token_type, token_value = token.to_s.squish.split(" ")
-    error! "Token type is not provided or invalid.", 102 unless token_type == "Bearer"
-    returned = JWT.decode(token_value, nil, true, @verification_options) { |header| public_key(header.deep_symbolize_keys) }
+    error! type: :token_missing unless token.present?
+
+    returned = JWT.decode token, nil, true, @verification_options do |header|
+      public_key(header.deep_symbolize_keys)
+    end
+
     returned.map(&:deep_symbolize_keys)
+
   rescue JWT::ExpiredSignature => e
-    error!(e.inspect, 104)
+    error! message: e.inspect, type: :token_expired
+
   rescue JWT::DecodeError => e
-    error!(e.inspect, 103)
+    error! message: e.inspect, type: :token_invalid
   end
 
 protected
@@ -37,7 +41,8 @@ protected
 
   def token_verification_options_from_environment(namespace)
     namespace = namespace.gsub(/_+\z/, "")
-    { verify_expiration: ENV["#{namespace}_VERIFY_EXP"] != "false",
+    options = {
+      verify_expiration: ENV["#{namespace}_VERIFY_EXP"] != "false",
       verify_not_before: ENV["#{namespace}_VERIFY_NBF"] != "false",
       iss:               ENV["#{namespace}_ISS"].to_s.split(",").map(&:squish).reject(&:blank?).presence, # Comma-separated values.
       verify_iat:        ENV["#{namespace}_VERIFY_IAT"] != "false",
@@ -49,16 +54,16 @@ protected
       iat_leeway:        ENV["#{namespace}_IAT_LEEWAY"].to_s.squish.yield_self { |n| n.to_i if n.present? },
       exp_leeway:        ENV["#{namespace}_EXP_LEEWAY"].to_s.squish.yield_self { |n| n.to_i if n.present? },
       nbf_leeway:        ENV["#{namespace}_NBF_LEEWAY"].to_s.squish.yield_self { |n| n.to_i if n.present? }
-    }.tap { |options|
-      options.merge! \
-        verify_sub: options[:sub].present?,
-        verify_iss: options[:iss].present?,
-        verify_aud: options[:aud].present?
-    }.compact
+    }
+    options.merge! \
+      verify_sub: options[:sub].present?,
+      verify_iss: options[:iss].present?,
+      verify_aud: options[:aud].present?
+    options.compact
   end
 
-  def error!(message, code = nil)
-    raise Error.new(message, code)
+  def error!(**options)
+    raise Error.new(**options)
   end
 
   class << self
@@ -68,11 +73,11 @@ protected
   end
 
   class Error < StandardError
-    attr_reader :code
+    attr_reader :type
 
-    def initialize(message, code = nil)
-      super(message)
-      @code = code
+    def initialize(message: nil, type:)
+      super message.presence || type.to_s.humanize
+      @type = type
     end
   end
 end

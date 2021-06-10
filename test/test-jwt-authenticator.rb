@@ -76,13 +76,7 @@ class JWTAuthenticatorTest < Test::Unit::TestCase
   test "blank token" do
     error = assert_raises(JWT::Authenticator::Error) { JWT::Authenticator.instance.call(" ") }
     assert_match(/\bmissing\b/i, error.message)
-    assert_equal(101, error.code)
-  end
-
-  test "token with invalid type" do
-    error = assert_raises(JWT::Authenticator::Error) { JWT::Authenticator.instance.call("Beer XXX.YYY.ZZZ") }
-    assert_match(/\binvalid\b/i, error.message)
-    assert_equal(102, error.code)
+    assert_equal(:token_missing, error.type)
   end
 
   test "token decoding and verification" do
@@ -96,63 +90,63 @@ class JWTAuthenticatorTest < Test::Unit::TestCase
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.merge(iss: "qux"))
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid issuer\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "missing iss" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.tap { |p| p.delete(:iss) })
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid issuer\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "missing aud" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.tap { |p| p.delete(:aud) })
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid audience\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "wrong aud" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.merge(aud: "qux"))
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid audience\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "missing sub" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.tap { |p| p.delete(:sub) })
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid subject\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "wrong sub" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.merge(sub: "qux"))
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid subject\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "token is expired" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.merge(exp: Time.now.to_i - 5))
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\bexpired\b/i, error.message)
-    assert_equal(104, error.code)
+    assert_equal(:token_expired, error.type)
   end
 
   test "missing jti" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.tap { |p| p.delete(:jti) })
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\bmissing jti\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "issued at in future" do
     jwt = my_api_v2_jwt_encode(my_api_v2_jwt_payload.merge(iat: Time.now.to_i + 30))
     error = assert_raises(JWT::Authenticator::Error) { my_api_v2_jwt_decode(jwt) }
     assert_match(/\binvalid iat\b/i, error.message)
-    assert_equal(103, error.code)
+    assert_equal(:token_invalid, error.type)
   end
 
   test "loading token verification options from environment (authenticator nested under multiple modules)" do
@@ -185,6 +179,6 @@ private
   end
 
   def my_api_v2_jwt_decode(jwt)
-    MyAPIv2::JWTAuthenticator.call("Bearer " + jwt)
+    MyAPIv2::JWTAuthenticator.call(jwt)
   end
 end
