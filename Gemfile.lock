@@ -2,31 +2,32 @@ PATH
   remote: .
   specs:
     jwt-authenticator (2.0.0)
-      activesupport (>= 4.0, < 6.0)
+      activesupport (>= 4.0, < 8.0)
       jwt (~> 2.1)
       method-not-implemented (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.6)
+    activesupport (6.1.7.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
-    concurrent-ruby (1.1.9)
-    i18n (1.8.10)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
+    concurrent-ruby (1.2.0)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     jwt (2.2.3)
     method-not-implemented (1.0.1)
-    minitest (5.14.4)
+    minitest (5.15.0)
     power_assert (2.0.0)
     rake (12.3.3)
     test-unit (3.4.4)
       power_assert
-    thread_safe (0.3.6)
-    tzinfo (1.2.9)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    zeitwerk (2.6.6)
 
 PLATFORMS
   ruby
